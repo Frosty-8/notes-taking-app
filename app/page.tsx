@@ -1,5 +1,4 @@
 "use client"
-// import { Button } from "@/components/ui/button";
 import Sidebars from "@/components/Sidebars";
 import Header from "@/components/Header";
 import { Note } from "@/lib/types";
