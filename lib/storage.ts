@@ -1,31 +1,46 @@
-import { Note } from "./types"
+import { Note } from "./types";
 
-const STORAGE_KEY = "notes"
+// Load notes from API
+export async function loadNotes(): Promise<Note[]> {
+  if (typeof window === "undefined") return [];
 
-export function loadNotes(): Note[] {
-  if (typeof window === "undefined") return []
-
-  const savedNotes = localStorage.getItem(STORAGE_KEY)
-  if (savedNotes) {
-    try {
-      return JSON.parse(savedNotes)
-    } catch (error) {
-      console.error("Failed to parse notes from localStorage", error)
-      return []
+  try {
+    const response = await fetch('/api/notes');
+    if (!response.ok) {
+      throw new Error('Failed to fetch notes');
     }
+    const notes = await response.json();
+    return notes as Note[];
+  } catch (error) {
+    console.error("Failed to load notes from API:", error);
+    return [];
   }
-  return []
 }
 
-export function saveNotes(notes: Note[]): void {
-  if (typeof window === "undefined") return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+// Save notes to API
+export async function saveNotes(notes: Note[]): Promise<void> {
+  if (typeof window === "undefined") return;
+
+  try {
+    const response = await fetch('/api/notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(notes),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save notes');
+    }
+  } catch (error) {
+    console.error("Failed to save notes to API:", error);
+    throw error;
+  }
 }
 
+// Format date (unchanged)
 export function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric"
-  })
+    day: "numeric",
+  });
 }
