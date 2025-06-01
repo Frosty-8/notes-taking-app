@@ -83,14 +83,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to save notes', details: error.message }, { status: 500 });
   }
 }
-
-// Close connection (optional, for cleanup during server shutdown)
-export async function closeMongoDB() {
-  if (client) {
-    await client.close();
-    client = null;
-    db = null;
-    notesCollection = null;
-    console.log('MongoDB connection closed');
-  }
-}
