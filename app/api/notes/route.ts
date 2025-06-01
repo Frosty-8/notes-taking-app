@@ -38,7 +38,8 @@ async function initializeMongoDB() {
     } catch (error) {
       console.error(`MongoDB connection attempt ${attempt} failed:`, error);
       if (attempt === maxRetries) {
-        throw new Error(`Failed to connect to MongoDB after ${maxRetries} attempts: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new Error(`Failed to connect to MongoDB after ${maxRetries} attempts: ${errorMessage}`);
       }
       attempt++;
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retrying
@@ -59,7 +60,8 @@ export async function GET() {
     return NextResponse.json(notes);
   } catch (error) {
     console.error('Failed to load notes:', error);
-    return NextResponse.json([], { status: 500, statusText: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json([], { status: 500, statusText: errorMessage });
   }
 }
 
@@ -80,6 +82,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Notes saved' });
   } catch (error) {
     console.error('Failed to save notes:', error);
-    return NextResponse.json({ error: 'Failed to save notes', details: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: 'Failed to save notes', details: errorMessage }, { status: 500 });
   }
 }
